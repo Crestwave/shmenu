@@ -11,7 +11,7 @@ trap 'printf "\e[H%*s\e8\e[?7h" "$COLUMNS" ""' EXIT
 printf '\e7\e[?7l'
 while true; do
 	[[ ${text_cache-x} != "$text" ]] && {
-		unset sel matches
+		unset sel matches max_items
 		for i in "${!items[@]}"; do
 			[[ ${items[i]} == *"$text"* ]] && {
 				matches+=("${items[i]}")
@@ -50,7 +50,8 @@ while true; do
 	[[ -n ${matches[*]} ]] && {
 		printf '\e[;%sH' $(( longest - ${#text} + 6 ))
 		matches[sel]=$'\e[m\e[D\e[1;37;7m '${matches[sel]}
-		printf '\e[30;41m %s \e[m' "${matches[@]:starting:max_items-starting}"
+		printf '\e[30;41m %s \e[m' \
+			"${matches[@]:starting:max_items-starting}"
 		matches[sel]=${matches[sel]#$'\e[m\e[D\e[1;37;7m '}
 	}
 
@@ -58,9 +59,8 @@ while true; do
 		$(( COLUMNS - length )) "" \
 		$(( ${#text} + 2 ))
 
-	read -srn 1
-
-	if [[ $REPLY == $'\e' ]]; then
+	read -rsn 1
+	if [[ $REPLY == $'\e' ]] && read -t 0; then
 		read -rsn 2 key
 		key=${REPLY}${key}
 	else
@@ -84,8 +84,8 @@ while true; do
 			printf '\e7'
 			break
 			;;
-		$'\t')
-			text=${matches[sel]}
+		$'\e')
+			exit
 			;;
 		$'\e[D' | $'\e[A')
 			(( sel > 0 && sel-- && sel == starting - 1 )) && {
@@ -106,7 +106,10 @@ while true; do
 			}
 			;;
 		$'\177' | $'\b')
-			(( ${#text} > 0 )) && text=${text:: -1}
+			text=${text%?}
+			;;
+		$'\t')
+			text=${matches[sel]}
 			;;
 		*)
 			text+=$key
