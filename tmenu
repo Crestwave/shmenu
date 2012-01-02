@@ -10,14 +10,20 @@ trap '(( max_items = starting )); break' WINCH
 printf '\e7\e[?7l'
 while true; do
 	[[ ${text_cache-${text}x} != "$text" ]] && {
-		unset sel matches max_items
-		for i in "${!items[@]}"; do
-			[[ ${items[i]} == *"$text"* ]] && {
-				matches+=("${items[i]}")
-				(( ${#items[i]} > longest )) &&
-					longest=${#items[i]}
-			}
+		unset sel max_items exact prefix substring
+
+		for item in "${items[@]}"; do
+			case $item in
+				$text)		exact+=("$item") ;;
+				$text*)		prefix+=("$item") ;;
+				*$text*)	substring+=("$item") ;;
+				*)		continue ;;
+			esac
+
+			(( ${#item} > longest )) && longest=${#item}
 		done
+
+		matches=("${exact[@]}" "${prefix[@]}" "${substring[@]}")
 		starting=(0 0)
 	}
 
@@ -45,7 +51,6 @@ while true; do
 			fi
 		done
 
-		#printf '\e[2H%s' "$sel $max_items $starting"
 		(( sel >= max_items )) && {
 			(( starting = max_items ))
 			continue
