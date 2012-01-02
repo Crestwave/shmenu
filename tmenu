@@ -44,6 +44,12 @@ while true; do
 				break
 			fi
 		done
+
+		#printf '\e[2H%s' "$sel $max_items $starting"
+		(( sel >= max_items )) && {
+			(( starting = max_items ))
+			continue
+		}
 	}
 
 	[[ -n ${matches[*]} ]] && {
