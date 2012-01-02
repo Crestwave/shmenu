@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
 
-shopt -s checkwinsize
 mapfile -t items
+shopt -s checkwinsize
 exec 6>&1 < /dev/tty > /dev/tty
 
 trap 'printf "\e[H%*s\e8\e[?7h" "$COLUMNS" ""' EXIT
-trap '{
-	(( max_items = starting ))
-	REPLY=redraw
-	break
-}' WINCH
+trap '(( max_items = starting )); break' WINCH
 
 printf '\e7\e[?7l'
 while true; do
@@ -62,13 +58,13 @@ while true; do
 		$(( COLUMNS - length )) "" \
 		$(( ${#text} + 2 ))
 
-	until read -t 0.01 -rsn 1; do :; done
+	until read -t 0.05 -rsn 1; do :; done
+
+	(( max_items == starting )) && continue
 
 	if [[ $REPLY == $'\e' ]]; then
 		read -t 0.01 -rsn 2 key
 		key=${REPLY}${key}
-	elif [[ $REPLY == redraw ]]; then
-		continue
 	else
 		key=$REPLY
 	fi
