@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 
 shopt -s checkwinsize
-IFS=$'\n' read -d "" -ra items
+mapfile -t items
 exec 6>&1 < /dev/tty > /dev/tty
-(:); [[ -z ${LINES}${COLUMNS} ]] &&
-	read -r LINES COLUMNS < <(stty size)
 
 trap 'printf "\e[H%*s\e8\e[?7h" "$COLUMNS" ""' EXIT
+trap '{
+	(( max_items = starting ))
+	REPLY=redraw
+	break
+}' WINCH
 
 printf '\e7\e[?7l'
 while true; do
-	[[ ${text_cache-x} != "$text" ]] && {
+	[[ ${text_cache-${text}x} != "$text" ]] && {
 		unset sel matches max_items
 		for i in "${!items[@]}"; do
 			[[ ${items[i]} == *"$text"* ]] && {
@@ -59,17 +62,16 @@ while true; do
 		$(( COLUMNS - length )) "" \
 		$(( ${#text} + 2 ))
 
-	read -rsn 1
-	if [[ $REPLY == $'\e' ]] && read -t 0; then
-		read -rsn 2 key
+	until read -t 0.01 -rsn 1; do :; done
+
+	if [[ $REPLY == $'\e' ]]; then
+		read -t 0.01 -rsn 2 key
 		key=${REPLY}${key}
+	elif [[ $REPLY == redraw ]]; then
+		continue
 	else
 		key=$REPLY
 	fi
-
-	while read -t 0; do
-		read -rsn 1 _
-	done
 
 	text_cache=$text
 
