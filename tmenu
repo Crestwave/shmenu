@@ -11,16 +11,17 @@ printf '\e7\e[?7l'
 while true; do
 	(:)
 	[[ ${text_cache-${text}x} != "$text" ]] && {
-		unset sel max_items exact prefix substring matches
+		unset sel max_items matches
 
 		for item in "${items[@]}"; do
 			case $item in
-				$text)		matches[0]+=" $item" ;;
-				$text*)		matches[1]+=" $item" ;;
-				*$text*)	matches[2]+=" $item" ;;
+				$text)		: 0 ;;
+				$text*)		: 1 ;;
+				*$text*)	: 2 ;;
 				*)		continue ;;
 			esac
 
+			matches[_]+=" $item"
 			(( ${#item} > longest )) && longest=${#item}
 		done
 
