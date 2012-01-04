@@ -21,11 +21,11 @@ while true; do
 				*)		continue ;;
 			esac
 
-			matches[_]+=" $item"
+			matches[_]+=$'\n'$item
 			(( ${#item} > longest )) && longest=${#item}
 		done
 
-		IFS=" " read -ra matches <<< "${matches[@]}"
+		mapfile -s 1 -t matches <<< "${matches[@]}"
 		index=(0 0)
 	}
 
