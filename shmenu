@@ -5,7 +5,7 @@ shopt -s checkwinsize
 exec 6>&1 < /dev/tty > /dev/tty
 
 trap 'printf "\e[H%*s\e8\e[?7h" "$COLUMNS" ""' EXIT
-trap '(( max_items = starting )); break' WINCH
+trap '(( max_items = index )); break' WINCH
 
 printf '\e7\e[?7l'
 while true; do
@@ -26,19 +26,19 @@ while true; do
 		done
 
 		IFS=" " read -ra matches <<< "${matches[@]}"
-		starting=(0 0)
+		index=(0 0)
 	}
 
 	printf '\e[?25l\e[H\e[30;41m %s%*s\e[m' \
 		"$text" \
-		$(( longest - ${#text} + 4 )) "${starting[2]:+<} "
+		$(( longest - ${#text} + 4 )) "${index[2]:+<} "
 
-	(( starting == max_items )) && {
+	(( index == max_items )) && {
 		unset length max_items
 		(( length += longest + 5 ))
-		(( max_items += starting ))
+		(( max_items += index ))
 
-		for (( i = starting; i < ${#matches[@]}; i++ )); do
+		for (( i = index; i < ${#matches[@]}; i++ )); do
 			if (( length < COLUMNS - ${#matches[i]} - 7 )); then
 				(( length += ${#matches[i]} + 2 ))
 				(( max_items++ ))
@@ -53,7 +53,7 @@ while true; do
 		done
 
 		(( sel >= max_items )) && {
-			(( starting = max_items ))
+			(( index = max_items ))
 			continue
 		}
 	}
@@ -62,7 +62,7 @@ while true; do
 		printf '\e[;%sH' $(( longest - ${#text} + 6 ))
 		matches[sel]=$'\e[m\e[D\e[1;37;7m '${matches[sel]}
 		printf '\e[30;41m %s \e[m' \
-			"${matches[@]:starting:max_items-starting}"
+			"${matches[@]:index:max_items-index}"
 		matches[sel]=${matches[sel]#$'\e[m\e[D\e[1;37;7m '}
 	}
 
@@ -72,7 +72,7 @@ while true; do
 
 	until read -t 0.05 -rsn 1; do :; done
 
-	(( max_items == starting )) && continue
+	(( max_items == index )) && continue
 
 	if [[ $REPLY == $'\e' ]]; then
 		read -t 0.01 -rsn 2 key
@@ -98,10 +98,10 @@ while true; do
 			exit
 			;;
 		$'\e[D' | $'\e[A')
-			(( sel > 0 && sel-- && sel == starting - 1 )) && {
-				starting[0]=${starting[${#starting[@]}-2]}
-				unset starting[${#starting[@]}-1]
-				(( max_items = starting ))
+			(( sel > 0 && sel-- && sel == index - 1 )) && {
+				index[0]=${index[${#index[@]}-2]}
+				unset index[${#index[@]}-1]
+				(( max_items = index ))
 			}
 			;;
 		$'\e[C' | $'\e[B')
@@ -111,8 +111,8 @@ while true; do
 				sel == max_items &&
 				max_items < ${#items[@]}
 			)) && {
-				starting[${#starting[@]}]=$max_items
-				starting[0]=$max_items
+				index[${#index[@]}]=$max_items
+				index[0]=$max_items
 			}
 			;;
 		$'\177' | $'\b')
