@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
 #set -- $(< /dev/stdin)
-mapfile -t items < /dev/stdin
-#IFS=$'\n' read -ra items < /dev/stdin
-for index in "${!items[@]}"; do
-	(( ${#item[index]} > length )) && length="${#item[index]}"
-done
+#mapfile -t items < /dev/stdin
+IFS=$'\n' read -d "" -ra items < /dev/stdin
+#for index in "${!items[@]}"; do
+#	(( ${#items[index]} > length )) && length="${#items[index]}"
+#	:
+#done
 #matches=("${items[@]}")
 
 trap "printf '\e8'" EXIT
@@ -16,15 +17,15 @@ while true; do
 	printf '\e[H\e[30;41m%*s\e[m' "$COLUMNS"
 	unset matches
 	for j in "${!items[@]}"; do
-		[[ ${items[j]} == *$abc* ]] && {
+		[[ ${items[j]} == *"${text// }"* ]] && {
 			matches+=(${items[j]})
 			((${#items[j]}>length)) && length=${#items[j]}
 		}
 	done
 
 	#printf '\r\033[2K'
-	printf '\e[H\e[30;41m%s%*s\e[m' " $abc" "$(( length + 4 - ${#abc} ))"
-	#printf '\e[30;41m%*s\e[m' "$((length+4-${#abc}))"
+	printf '\e[H\e[30;41m%s%*s\e[m' " $text" "$(( length + 4 - ${#text} ))"
+	#printf '\e[30;41m%*s\e[m' "$((length+4-${#text}))"
 	for j in "${!matches[@]}"; do
 		#echo "${items[j]}"
 		if (( j == i - 1 )); then
@@ -36,8 +37,8 @@ while true; do
 		fi
 		#printf '\e[1;'
 	done
-	((${#matches[@]})) || selected=$abc
-	printf '\e[;%sH' "$((${#abc}+2))"
+	((${#matches[@]})) || selected=$text
+	printf '\e[;%sH' $(( ${#text} + 2 ))
 	read -srn 1
 	if [[ $REPLY == $'\e' ]]; then
 		read -rsn 2 key
@@ -55,17 +56,17 @@ while true; do
 			exit
 			;;
 		$'\e[D')
-			((i>1)) && ((i--))
+			(( i > 1 )) && (( i-- ))
 			;;
 		$'\e[C')
-			((i<${#matches[@]})) && ((i++))
+			(( i < ${#matches[@]} )) && (( i++ ))
 			;;
 		$'\177'|$'\b')
-			((${#abc}>0)) && abc=${abc:: -1}
+			(( ${#text} > 0 )) && text=${text:: -1}
 			i=1
 			;;
 		*)
-			abc+=$key
+			text+=$key
 			i=1
 			;;
 	esac
