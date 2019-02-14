@@ -10,15 +10,15 @@ trap '{
 
 printf '\e7' > /dev/tty
 while true; do
-	(:)
 	unset matches
 	for i in "${!items[@]}"; do
-		[[ ${items[i]} == *"${text// }"* ]] && {
+		[[ ${items[i]} == *"$text"* ]] && {
 			matches+=("${items[i]}")
 			(( ${#items[i]} > length )) && length=${#items[i]}
 		}
 	done
 
+	(:)
 	printf '\e[H\e[30;41m %s%*s\e[m\e[;%sH' \
 		"$text" \
 		$(( COLUMNS - ${#text} - 1)) "" \
@@ -55,13 +55,13 @@ while true; do
 			printf '\e7'
 			break
 			;;
-		$'\e[D'|$'\e[A')
+		$'\e[D' | $'\e[A')
 			(( sel > 0 )) && (( sel-- ))
 			;;
-		$'\e[C'|$'\e[B')
+		$'\e[C' | $'\e[B')
 			(( sel < ${#matches[@]} - 1 )) && (( sel++ ))
 			;;
-		$'\177'|$'\b')
+		$'\177' | $'\b')
 			(( ${#text} > 0 )) && {
 				text=${text:: -1}
 				sel=0
