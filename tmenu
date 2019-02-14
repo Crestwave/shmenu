@@ -5,7 +5,7 @@ read -r LINES COLUMNS < <(stty size -F /dev/tty)
 
 trap '{
 	printf "\e8" > /dev/tty
-	printf "%b" "${output:+$output\n}"
+	[[ -n $output ]] && printf "%s\n" "$output"
 }' EXIT
 
 printf '\e7' > /dev/tty
