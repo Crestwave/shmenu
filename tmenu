@@ -14,25 +14,24 @@ read -r LINES COLUMNS < <(stty size -F /dev/tty)
 printf '\e7'
 while true; do
 	printf '\e[H\e[30;41m%*s\e[m' "$COLUMNS"
+
 	unset matches
-	for j in "${!items[@]}"; do
-		[[ ${items[j]} == *"${text// }"* ]] && {
-			matches+=("${items[j]}")
-			(( ${#items[j]} > length )) && length=${#items[j]}
+	for i in "${!items[@]}"; do
+		[[ ${items[i]} == *"${text// }"* ]] && {
+			matches+=("${items[i]}")
+			(( ${#items[i]} > length )) && length=${#items[i]}
 		}
 	done
 
 	#printf '\r\033[2K'
 	printf '\e[H\e[30;41m%s%*s\e[m' " $text" "$(( length + 4 - ${#text} ))"
 	#printf '\e[30;41m%*s\e[m' "$((length+4-${#text}))"
-	for j in "${!matches[@]}"; do
+	for i in "${!matches[@]}"; do
 		#echo "${items[j]}"
-		if (( j == sel )); then
+		if (( i == sel )); then
 			printf '\e[1;37;7m %s \e[m' "${matches[j]}"
-			#sel=$j
 		else
 			printf '\e[30;41m %s \e[m' "${matches[j]}"
-			#printf ' %s '
 		fi
 		#printf '\e[1;'
 	done
