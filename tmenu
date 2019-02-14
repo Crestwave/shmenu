@@ -6,69 +6,37 @@ mapfile -t items < /dev/stdin
 for index in "${!items[@]}"; do
 	(( ${#item[index]} > length )) && length="${#item[index]}"
 done
-match=("${items[@]}")
-#stty size -F /dev/tty
-#trap "printf '\e[?25h\e8'" EXIT
+#matches=("${items[@]}")
+
 trap "printf '\e8'" EXIT
-
-
 read -r LINES COLUMNS < <(stty size -F /dev/tty)
 i=1
 printf '\e7'
 while true; do
-	printf '\e[0H\e[30;41m%*s\e[m' "$COLUMNS"
-	#printf '\e[0H\e[1;30;7m%*s\e[m' "$COLUMNS"
-	#exit
-	case $key in
-		"")
-			[[ -v selected ]] && {
-				printf '\e8'
-				printf '%s\n' "$selected"
-				printf '\e7'
-				exit
-			}
-			;;
-		$'\e[D')
-			((i>1)) && ((i--))
-			;;
-		$'\e[C')
-			((i<${#match[@]})) && ((i++))
-			;;
-		$'\177'|$'\b')
-			((${#abc}>0)) && abc=${abc:: -1}
-			i=1
-			;;
-		*)
-			abc+=$key
-			i=1
-			;;
-	esac
-	#set -x
-	#echo "$abc"
-	#echo "$i"
-	unset match
+	printf '\e[H\e[30;41m%*s\e[m' "$COLUMNS"
+	unset matches
 	for j in "${!items[@]}"; do
 		[[ ${items[j]} == *$abc* ]] && {
-			match+=(${items[j]})
+			matches+=(${items[j]})
 			((${#items[j]}>length)) && length=${#items[j]}
 		}
 	done
 
 	#printf '\r\033[2K'
-	printf '\e[H\e[30;41m%s%*s\e[m' " $abc" "$((length+4-${#abc}))"
+	printf '\e[H\e[30;41m%s%*s\e[m' " $abc" "$(( length + 4 - ${#abc} ))"
 	#printf '\e[30;41m%*s\e[m' "$((length+4-${#abc}))"
-	for j in "${!match[@]}"; do
+	for j in "${!matches[@]}"; do
 		#echo "${items[j]}"
-		if ((j==i-1)); then
-			printf '\e[1;37;7m%s\e[m' " ${match[j]} "
-			selected=${match[j]}
+		if (( j == i - 1 )); then
+			printf '\e[1;37;7m %s \e[m' "${matches[j]}"
+			selected=${matches[j]}
 		else
-			printf '\e[30;41m %s \e[m' "${match[j]}"
+			printf '\e[30;41m %s \e[m' "${matches[j]}"
 			#printf ' %s '
 		fi
 		#printf '\e[1;'
 	done
-	((${#match[@]})) || selected=$abc
+	((${#matches[@]})) || selected=$abc
 	printf '\e[;%sH' "$((${#abc}+2))"
 	read -srn 1
 	if [[ $REPLY == $'\e' ]]; then
@@ -79,4 +47,27 @@ while true; do
 	else
 		key=$REPLY
 	fi
+	case $key in
+		"")
+			printf '\e8'
+			printf '%s\n' "$selected"
+			printf '\e7'
+			exit
+			;;
+		$'\e[D')
+			((i>1)) && ((i--))
+			;;
+		$'\e[C')
+			((i<${#matches[@]})) && ((i++))
+			;;
+		$'\177'|$'\b')
+			((${#abc}>0)) && abc=${abc:: -1}
+			i=1
+			;;
+		*)
+			abc+=$key
+			i=1
+			;;
+	esac
+
 done < /dev/tty
