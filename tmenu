@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
+shopt -s checkwinsize
 IFS=$'\n' read -d "" -ra items < /dev/stdin
-read -r LINES COLUMNS < <(stty size -F /dev/tty)
 
 trap '{
 	printf "\e8" > /dev/tty
@@ -10,6 +10,7 @@ trap '{
 
 printf '\e7' > /dev/tty
 while true; do
+	(:)
 	unset matches
 	for i in "${!items[@]}"; do
 		[[ ${items[i]} == *"${text// }"* ]] && {
@@ -24,13 +25,11 @@ while true; do
 		$(( length + 6 ))
 
 	for i in "${!matches[@]}"; do
-		#echo "${items[j]}"
 		if (( i == sel )); then
 			printf '\e[1;37;7m %s \e[m' "${matches[i]}"
 		else
 			printf '\e[30;41m %s \e[m' "${matches[i]}"
 		fi
-		#printf '\e[1;'
 	done
 
 	printf '\e[;%sH' $(( ${#text} + 2 ))
@@ -55,17 +54,18 @@ while true; do
 			fi
 			printf '\e7'
 			break
-			exit
 			;;
-		$'\e[D')
+		$'\e[D'|$'\e[A')
 			(( sel > 0 )) && (( sel-- ))
 			;;
-		$'\e[C')
+		$'\e[C'|$'\e[B')
 			(( sel < ${#matches[@]} - 1 )) && (( sel++ ))
 			;;
 		$'\177'|$'\b')
-			(( ${#text} > 0 )) && text=${text:: -1}
-			sel=0
+			(( ${#text} > 0 )) && {
+				text=${text:: -1}
+				sel=0
+			}
 			;;
 		*)
 			text+=$key
