@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-#echo $LINES
 #set -- $(< /dev/stdin)
 mapfile -t items < /dev/stdin
 #IFS=$'\n' read -ra items < /dev/stdin
@@ -11,25 +10,9 @@ match=("${items[@]}")
 #stty size -F /dev/tty
 #trap "printf '\e[?25h\e8'" EXIT
 trap "printf '\e8'" EXIT
-get_term_size() {
-	read -r LINES COLUMNS < <(stty size < /dev/tty)
-	#((max_items=LINES-3))
-}
-get_term_size
 
-key() {
-	[[ $1 == $'\e' ]] && {
-		read -rsn 2 key
-		[[ ${1}${key} == $'\e\e['* ]] &&
-			read -rs -n 1 _
-		key=${1}${key}
-	} || key=$1
-}
 
-#printf '\e[?25l\e[1;%sr' "$max_items"
-#printf '\e[?25l'
-#echo "$@"
-#printf '
+read -r LINES COLUMNS < <(stty size -F /dev/tty)
 i=1
 printf '\e7'
 while true; do
@@ -72,9 +55,8 @@ while true; do
 	done
 
 	#printf '\r\033[2K'
-	printf '\e[H'
-	printf '\e[30;41m%s\e[m' " $abc"
-	printf '\e[30;41m%*s\e[m' "$((length+4-${#abc}))"
+	printf '\e[H\e[30;41m%s%*s\e[m' " $abc" "$((length+4-${#abc}))"
+	#printf '\e[30;41m%*s\e[m' "$((length+4-${#abc}))"
 	for j in "${!match[@]}"; do
 		#echo "${items[j]}"
 		if ((j==i-1)); then
@@ -88,6 +70,13 @@ while true; do
 	done
 	((${#match[@]})) || selected=$abc
 	printf '\e[;%sH' "$((${#abc}+2))"
-	#read_flags=(-t 0.05)
-	read "${read_flags[@]}" -srn 1 && key "$REPLY"
+	read -srn 1
+	if [[ $REPLY == $'\e' ]]; then
+		read -rsn 2 key
+		[[ ${REPLY}${key} == $'\e\e['* ]] &&
+			read -rs -n 1 _
+		key=${REPLY}${key}
+	else
+		key=$REPLY
+	fi
 done < /dev/tty
