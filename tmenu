@@ -11,7 +11,6 @@ IFS=$'\n' read -d "" -ra items < /dev/stdin
 
 trap "printf '\e8'" EXIT
 read -r LINES COLUMNS < <(stty size -F /dev/tty)
-sel=1
 printf '\e7'
 while true; do
 	printf '\e[H\e[30;41m%*s\e[m' "$COLUMNS"
@@ -28,7 +27,7 @@ while true; do
 	#printf '\e[30;41m%*s\e[m' "$((length+4-${#text}))"
 	for j in "${!matches[@]}"; do
 		#echo "${items[j]}"
-		if (( j == sel - 1 )); then
+		if (( j == sel )); then
 			printf '\e[1;37;7m %s \e[m' "${matches[j]}"
 			#sel=$j
 		else
@@ -51,23 +50,23 @@ while true; do
 	case $key in
 		"")
 			printf '\e8'
-			printf '%s\n' "${matches[sel-1]}"
+			printf '%s\n' "${matches[sel]}"
 			printf '\e7'
 			exit
 			;;
 		$'\e[D')
-			(( sel > 1 )) && (( sel-- ))
+			(( sel > 0 )) && (( sel-- ))
 			;;
 		$'\e[C')
-			(( sel < ${#matches[@]} )) && (( sel++ ))
+			(( sel < ${#matches[@]} - 1 )) && (( sel++ ))
 			;;
 		$'\177'|$'\b')
 			(( ${#text} > 0 )) && text=${text:: -1}
-			sel=1
+			sel=0
 			;;
 		*)
 			text+=$key
-			sel=1
+			sel=0
 			;;
 	esac
 
