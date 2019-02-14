@@ -13,7 +13,6 @@ trap "printf '\e8'" EXIT
 read -r LINES COLUMNS < <(stty size -F /dev/tty)
 printf '\e7'
 while true; do
-	printf '\e[H\e[30;41m%*s\e[m' "$COLUMNS"
 
 	unset matches
 	for i in "${!items[@]}"; do
@@ -23,20 +22,23 @@ while true; do
 		}
 	done
 
-	#printf '\r\033[2K'
-	printf '\e[H\e[30;41m%s%*s\e[m' " $text" "$(( length + 4 - ${#text} ))"
-	#printf '\e[30;41m%*s\e[m' "$((length+4-${#text}))"
+	printf '\e[H\e[30;41m %s%*s\e[m\e[;%sH' \
+		"$text" \
+		$(( COLUMNS - ${#text} - 1)) "" \
+		$(( length + 6 ))
+
 	for i in "${!matches[@]}"; do
 		#echo "${items[j]}"
 		if (( i == sel )); then
-			printf '\e[1;37;7m %s \e[m' "${matches[j]}"
+			printf '\e[1;37;7m %s \e[m' "${matches[i]}"
 		else
-			printf '\e[30;41m %s \e[m' "${matches[j]}"
+			printf '\e[30;41m %s \e[m' "${matches[i]}"
 		fi
 		#printf '\e[1;'
 	done
-	#((${#matches[@]})) || sel=$text
+
 	printf '\e[;%sH' $(( ${#text} + 2 ))
+
 	read -srn 1
 	if [[ $REPLY == $'\e' ]]; then
 		read -rsn 2 key
@@ -46,10 +48,15 @@ while true; do
 	else
 		key=$REPLY
 	fi
+
 	case $key in
 		"")
 			printf '\e8'
-			printf '%s\n' "${matches[sel]}"
+			if (( ${#matches[@]} )); then
+				printf '%s\n' "${matches[sel]}"
+			else
+				printf '%s\n' "$text"
+			fi
 			printf '\e7'
 			exit
 			;;
