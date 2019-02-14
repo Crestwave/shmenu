@@ -1,19 +1,15 @@
 #!/usr/bin/env bash
 
-#set -- $(< /dev/stdin)
-#mapfile -t items < /dev/stdin
 IFS=$'\n' read -d "" -ra items < /dev/stdin
-#for index in "${!items[@]}"; do
-#	(( ${#items[index]} > length )) && length="${#items[index]}"
-#	:
-#done
-#matches=("${items[@]}")
-
-trap "printf '\e8'" EXIT
 read -r LINES COLUMNS < <(stty size -F /dev/tty)
-printf '\e7'
-while true; do
 
+trap '{
+	printf "\e8" > /dev/tty
+	printf "%b" "${output:+$output\n}"
+}' EXIT
+
+printf '\e7' > /dev/tty
+while true; do
 	unset matches
 	for i in "${!items[@]}"; do
 		[[ ${items[i]} == *"${text// }"* ]] && {
@@ -53,11 +49,12 @@ while true; do
 		"")
 			printf '\e8'
 			if (( ${#matches[@]} )); then
-				printf '%s\n' "${matches[sel]}"
+				output=${matches[sel]}
 			else
-				printf '%s\n' "$text"
+				output=$text
 			fi
 			printf '\e7'
+			break
 			exit
 			;;
 		$'\e[D')
@@ -75,5 +72,4 @@ while true; do
 			sel=0
 			;;
 	esac
-
-done < /dev/tty
+done < /dev/tty > /dev/tty
