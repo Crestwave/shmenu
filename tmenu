@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+
+#echo $LINES
+#set -- $(< /dev/stdin)
+mapfile -t items < /dev/stdin
+#IFS=$'\n' read -ra items < /dev/stdin
+for index in "${!items[@]}"; do
+	(( ${#item[index]} > length )) && length="${#item[index]}"
+done
+match=("${items[@]}")
+#stty size -F /dev/tty
+#trap "printf '\e[?25h\e8'" EXIT
+trap "printf '\e8'" EXIT
+get_term_size() {
+	read -r LINES COLUMNS < <(stty size < /dev/tty)
+	#((max_items=LINES-3))
+}
+get_term_size
+
+key() {
+	[[ $1 == $'\e' ]] && {
+		read -rsn 2 key
+		[[ ${1}${key} == $'\e\e['* ]] &&
+			read -rs -n 1 _
+		key=${1}${key}
+	} || key=$1
+}
+
+#printf '\e[?25l\e[1;%sr' "$max_items"
+#printf '\e[?25l'
+#echo "$@"
+#printf '
+i=1
+printf '\e7'
+while true; do
+	printf '\e[0H\e[30;41m%*s\e[m' "$COLUMNS"
+	#printf '\e[0H\e[1;30;7m%*s\e[m' "$COLUMNS"
+	#exit
+	case $key in
+		"")
+			[[ -v selected ]] && {
+				printf '\e8'
+				printf '%s\n' "$selected"
+				printf '\e7'
+				exit
+			}
+			;;
+		$'\e[D')
+			((i>1)) && ((i--))
+			;;
+		$'\e[C')
+			((i<${#match[@]})) && ((i++))
+			;;
+		$'\177'|$'\b')
+			((${#abc}>0)) && abc=${abc:: -1}
+			i=1
+			;;
+		*)
+			abc+=$key
+			i=1
+			;;
+	esac
+	#set -x
+	#echo "$abc"
+	#echo "$i"
+	unset match
+	for j in "${!items[@]}"; do
+		[[ ${items[j]} == *$abc* ]] && {
+			match+=(${items[j]})
+			((${#items[j]}>length)) && length=${#items[j]}
+		}
+	done
+
+	#printf '\r\033[2K'
+	printf '\e[H'
+	printf '\e[30;41m%s\e[m' " $abc"
+	printf '\e[30;41m%*s\e[m' "$((length+4-${#abc}))"
+	for j in "${!match[@]}"; do
+		#echo "${items[j]}"
+		if ((j==i-1)); then
+			printf '\e[1;37;7m%s\e[m' " ${match[j]} "
+			selected=${match[j]}
+		else
+			printf '\e[30;41m %s \e[m' "${match[j]}"
+			#printf ' %s '
+		fi
+		#printf '\e[1;'
+	done
+	((${#match[@]})) || selected=$abc
+	printf '\e[;%sH' "$((${#abc}+2))"
+	#read_flags=(-t 0.05)
+	read "${read_flags[@]}" -srn 1 && key "$REPLY"
+done < /dev/tty
