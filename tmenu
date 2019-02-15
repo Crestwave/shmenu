@@ -19,14 +19,16 @@ while true; do
 	done
 
 	(( length += longest + 5 ))
+	(( max_items += starting ))
 
 	(:)
-	printf '\e[H\e[30;41m %s%*s\e[m\e[;%sH' \
+	printf '\e[H\e[30;41m %s%*s%*s\e[m\e[;%sH' \
 		"$text" \
-		$(( COLUMNS - ${#text} - 1)) "" \
+		$(( longest - ${#text} + 4 )) "${starting:+<} " \
+		$(( COLUMNS - ${#text} - 8)) "" \
 		$(( longest + 6 ))
 
-	for i in "${!matches[@]}"; do
+	for (( i = starting; i < ${#matches[@]}; i++ )); do
 		if (( length < COLUMNS - ${#matches[i]} - 7 )); then
 			(( length += ${#matches[i]} + 2 ))
 			(( max_items++ ))
@@ -69,15 +71,17 @@ while true; do
 			(( sel > 0 && sel-- ))
 			;;
 		$'\e[C' | $'\e[B')
+			#sel < max_items &&
 			((
 				sel < ${#matches[@]} - 1 &&
-				sel < max_items &&
 				sel++ &&
 				sel == max_items &&
-				starting = max_items &&
-				sel = 0
+				max_items < ${#items[@]}
+			)) &&
+			((
+				starting = max_items
 			))
-			fi
+				#sel = 0
 			;;
 		$'\177' | $'\b')
 			(( ${#text} > 0 )) && {
