@@ -23,7 +23,7 @@ while true; do
 	(( max_items += starting ))
 
 	(:)
-	printf '\e[H\e[30;41m %s%*s%*s\e[m\e[;%sH' \
+	printf '\e[?25l\e[H\e[30;41m %s%*s%*s\e[m\e[;%sH' \
 		"$text" \
 		$(( longest - ${#text} + 4 )) "${starting[2]:+<} " \
 		$(( COLUMNS - ${#text} - longest )) "" \
@@ -45,7 +45,7 @@ while true; do
 		fi
 	done
 
-	printf '\e[;%sH' $(( ${#text} + 2 ))
+	printf '\e[?25h\e[;%sH' $(( ${#text} + 2 ))
 
 	read -srn 1
 	if [[ $REPLY == $'\e' ]]; then
@@ -72,7 +72,7 @@ while true; do
 			#echo "${#starting[@]}" :"${starting[@]}"; read -t 0.05
 			#echo "${starting[@]}"; sleep 1
 			#(( ${#starting[@]} > 2 )) && echo "${starting[@]}" && sleep 9999
-			(:;:); (:;:); (:;:)
+			#(:;:); (:;:); (:;:)
 			(( sel > 0 && sel-- && sel == starting - 1 )) && {
 				#sleep 1
 				#set -x
@@ -85,7 +85,7 @@ while true; do
 			;;
 		$'\e[C' | $'\e[B')
 			#sel < max_items &&
-			(:;:); (:;:); (:;:)
+			#(:;:); (:;:); (:;:)
 			((
 				sel < ${#matches[@]} - 1 &&
 				sel++ &&
