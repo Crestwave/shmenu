@@ -10,21 +10,31 @@ trap '{
 
 printf '\e7' > /dev/tty
 while true; do
-	unset matches
+	unset matches length max_items
 	for i in "${!items[@]}"; do
 		[[ ${items[i]} == *"$text"* ]] && {
 			matches+=("${items[i]}")
-			(( ${#items[i]} > length )) && length=${#items[i]}
+			(( ${#items[i]} > longest )) && longest=${#items[i]}
 		}
 	done
+
+	(( length += longest + 5 ))
 
 	(:)
 	printf '\e[H\e[30;41m %s%*s\e[m\e[;%sH' \
 		"$text" \
 		$(( COLUMNS - ${#text} - 1)) "" \
-		$(( length + 6 ))
+		$(( longest + 6 ))
 
 	for i in "${!matches[@]}"; do
+		if (( length < COLUMNS - ${#matches[i]} - 7 )); then
+			(( length += ${#matches[i]} + 2 ))
+			(( max_items++ ))
+		else
+			printf '\e[30;41m%*s\n\e[m' "7" ">"
+			break
+		fi
+
 		if (( i == sel )); then
 			printf '\e[1;37;7m %s \e[m' "${matches[i]}"
 		else
@@ -38,7 +48,7 @@ while true; do
 	if [[ $REPLY == $'\e' ]]; then
 		read -rsn 2 key
 		[[ ${REPLY}${key} == $'\e\e['* ]] &&
-			read -rs -n 1 _
+			read -rsn 1 _
 		key=${REPLY}${key}
 	else
 		key=$REPLY
@@ -56,10 +66,18 @@ while true; do
 			break
 			;;
 		$'\e[D' | $'\e[A')
-			(( sel > 0 )) && (( sel-- ))
+			(( sel > 0 && sel-- ))
 			;;
 		$'\e[C' | $'\e[B')
-			(( sel < ${#matches[@]} - 1 )) && (( sel++ ))
+			((
+				sel < ${#matches[@]} - 1 &&
+				sel < max_items &&
+				sel++ &&
+				sel == max_items &&
+				starting = max_items &&
+				sel = 0
+			))
+			fi
 			;;
 		$'\177' | $'\b')
 			(( ${#text} > 0 )) && {
