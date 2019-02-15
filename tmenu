@@ -9,6 +9,7 @@ trap '{
 }' EXIT
 
 printf '\e7' > /dev/tty
+starting=(0)
 while true; do
 	unset matches length max_items
 	for i in "${!items[@]}"; do
@@ -68,20 +69,32 @@ while true; do
 			break
 			;;
 		$'\e[D' | $'\e[A')
-			(( sel > 0 && sel-- ))
+			#echo "${#starting[@]}"; sleep 1
+			#echo "${starting[@]}"; sleep 1
+			#(( ${#starting[@]} > 2 )) && echo "${starting[@]}" && sleep 9999
+			(:;:); (:;:); (:;:)
+			(( sel > 0 && sel-- && sel <= starting )) && {
+				#sleep 1
+				#set -x
+				starting[0]=${starting[${#starting[@]}-1]}
+				unset starting[${#starting[@]}-1]
+				#sleep 1
+				#set +x
+			}
+				#starting[0]=${starting[${#starting[@]}-1]}
 			;;
 		$'\e[C' | $'\e[B')
 			#sel < max_items &&
+			(:;:); (:;:); (:;:)
 			((
 				sel < ${#matches[@]} - 1 &&
 				sel++ &&
 				sel == max_items &&
 				max_items < ${#items[@]}
-			)) &&
-			((
-				starting = max_items
-			))
-				#sel = 0
+			)) && {
+				starting[${#starting[@]}]=$max_items
+				starting[0]=$max_items
+			}
 			;;
 		$'\177' | $'\b')
 			(( ${#text} > 0 )) && {
