@@ -9,8 +9,8 @@ trap '{
 }' EXIT
 
 printf '\e7' > /dev/tty
-starting=(0 0)
 while true; do
+	[[ -z ${starting[@]} ]] && starting=(0 0)
 	unset matches length max_items
 	for i in "${!items[@]}"; do
 		[[ ${items[i]} == *"$text"* ]] && {
@@ -25,8 +25,8 @@ while true; do
 	(:)
 	printf '\e[H\e[30;41m %s%*s%*s\e[m\e[;%sH' \
 		"$text" \
-		$(( longest - ${#text} + 4 )) "${starting:+<} " \
-		$(( COLUMNS - ${#text} - 8 )) "" \
+		$(( longest - ${#text} + 4 )) "${starting[2]:+<} " \
+		$(( COLUMNS - ${#text} - longest - 5 )) "" \
 		$(( longest + 6 ))
 
 	for (( i = starting; i < ${#matches[@]}; i++ )); do
@@ -34,7 +34,7 @@ while true; do
 			(( length += ${#matches[i]} + 2 ))
 			(( max_items++ ))
 		else
-			printf '\e[30;41m%*s\n\e[m' "7" ">"
+			printf '\e[30;41m\e[;%sH%s\n\e[m' $(( COLUMNS - 1 )) ">"
 			break
 		fi
 
@@ -99,12 +99,12 @@ while true; do
 		$'\177' | $'\b')
 			(( ${#text} > 0 )) && {
 				text=${text:: -1}
-				sel=0
+				unset sel starting
 			}
 			;;
 		*)
 			text+=$key
-			sel=0
+			unset sel starting
 			;;
 	esac
 done < /dev/tty > /dev/tty
