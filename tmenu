@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 shopt -s checkwinsize
-IFS=$'\n' read -d "" -ra items < /dev/stdin
+IFS=$'\n' read -t 0.01 -d "" -ra items
 
 trap '{
 	printf "\e8" > /dev/tty
@@ -45,7 +45,7 @@ while true; do
 	fi
 
 	case $key in
-		"")
+		"" | $'\r')
 			printf '\e8'
 			if (( ${#matches[@]} )); then
 				output=${matches[sel]}
