@@ -4,11 +4,11 @@ shopt -s checkwinsize
 IFS=$'\n' read -t 0.01 -d "" -ra items
 
 trap '{
-	printf "\e8" > /dev/tty
+	printf "\e8\e[?7h" > /dev/tty
 	[[ -n $output ]] && printf "%s\n" "$output"
 }' EXIT
 
-printf '\e7' > /dev/tty
+printf '\e7\e[?7l' > /dev/tty
 while true; do
 	[[ -z ${starting[@]} ]] && starting=(0 0)
 	unset matches length max_items
@@ -26,7 +26,7 @@ while true; do
 	printf '\e[H\e[30;41m %s%*s%*s\e[m\e[;%sH' \
 		"$text" \
 		$(( longest - ${#text} + 4 )) "${starting[2]:+<} " \
-		$(( COLUMNS - ${#text} - longest - 5 )) "" \
+		$(( COLUMNS - ${#text} - longest )) "" \
 		$(( longest + 6 ))
 
 	for (( i = starting; i < ${#matches[@]}; i++ )); do
