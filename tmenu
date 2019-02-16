@@ -75,23 +75,12 @@ while true; do
 			unset sel starting
 			;;
 		$'\e[D' | $'\e[A')
-			#echo "${#starting[@]}" :"${starting[@]}"; read -t 0.05
-			#echo "${starting[@]}"; sleep 1
-			#(( ${#starting[@]} > 2 )) && echo "${starting[@]}" && sleep 9999
-			#(:;:); (:;:); (:;:)
 			(( sel > 0 && sel-- && sel == starting - 1 )) && {
-				#sleep 1
-				#set -x
 				starting[0]=${starting[${#starting[@]}-2]}
 				unset starting[${#starting[@]}-1]
-				#sleep 1
-				#set +x
 			}
-				#starting[0]=${starting[${#starting[@]}-1]}
 			;;
 		$'\e[C' | $'\e[B')
-			#sel < max_items &&
-			#(:;:); (:;:); (:;:)
 			((
 				sel < ${#matches[@]} - 1 &&
 				sel++ &&
