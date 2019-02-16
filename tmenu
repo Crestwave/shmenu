@@ -53,12 +53,11 @@ while true; do
 	read -srn 1
 	if [[ $REPLY == $'\e' ]]; then
 		read -rsn 2 key
-		[[ ${REPLY}${key} == $'\e\e['* ]] &&
-			read -rsn 1 _
 		key=${REPLY}${key}
 	else
 		key=$REPLY
 	fi
+	read -t 0.01 -d "" -rs _
 
 	case $key in
 		"" | $'\r')
