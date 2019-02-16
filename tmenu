@@ -4,7 +4,7 @@ shopt -s checkwinsize
 IFS=$'\n' read -t 0.01 -d "" -ra items
 
 trap '{
-	printf "\e8\e[?7h" > /dev/tty
+	printf "\e[H%*s\e8\e[?7h" "$COLUMNS" "" > /dev/tty
 	[[ -n $output ]] && printf "%s\n" "$output"
 }' EXIT
 
