@@ -23,18 +23,19 @@ while true; do
 	(( max_items += starting ))
 
 	(:)
-	printf '\e[?25l\e[H\e[30;41m %s%*s%*s\e[m\e[;%sH' \
+	printf '\e[?25l\e[H\e[30;41m %s%*s\e[m' \
 		"$text" \
-		$(( longest - ${#text} + 4 )) "${starting[2]:+<} " \
-		$(( COLUMNS - ${#text} - longest )) "" \
-		$(( longest + 6 ))
+		$(( longest - ${#text} + 4 )) "${starting[2]:+<} "
 
 	for (( i = starting; i < ${#matches[@]}; i++ )); do
 		if (( length < COLUMNS - ${#matches[i]} - 7 )); then
 			(( length += ${#matches[i]} + 2 ))
 			(( max_items++ ))
 		else
-			printf '\e[30;41m\e[;%sH%s\n\e[m' $(( COLUMNS - 1 )) ">"
+			printf '\e[30;41m%*s\e[;%sH%s\n\e[m' \
+				$(( COLUMNS - length )) "" \
+				$(( COLUMNS - 1 )) ">"
+			(( length = COLUMNS ))
 			break
 		fi
 
@@ -45,7 +46,9 @@ while true; do
 		fi
 	done
 
-	printf '\e[?25h\e[;%sH' $(( ${#text} + 2 ))
+	printf '\e[30;41m%*s\e[m\e[?25h\e[;%sH' \
+		$(( COLUMNS - length )) "" \
+		$(( ${#text} + 2 ))
 
 	read -srn 1
 	if [[ $REPLY == $'\e' ]]; then
