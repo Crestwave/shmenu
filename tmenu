@@ -70,6 +70,10 @@ while true; do
 			printf '\e7'
 			break
 			;;
+		$'\t')
+			text=${matches[sel]}
+			unset sel starting
+			;;
 		$'\e[D' | $'\e[A')
 			#echo "${#starting[@]}" :"${starting[@]}"; read -t 0.05
 			#echo "${starting[@]}"; sleep 1
