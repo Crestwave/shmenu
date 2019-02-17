@@ -2,13 +2,11 @@
 
 shopt -s checkwinsize
 IFS=$'\n' read -t 0.01 -d "" -ra items
+exec 6>&1 < /dev/tty > /dev/tty
 
-trap '{
-	printf "\e[H%*s\e8\e[?7h" "$COLUMNS" "" > /dev/tty
-	[[ -n $output ]] && printf "%s\n" "$output"
-}' EXIT
+trap 'printf "\e[H%*s\e8\e[?7h" "$COLUMNS" ""' EXIT
 
-printf '\e7\e[?7l' > /dev/tty
+printf '\e7\e[?7l'
 while true; do
 	unset length max_items
 
@@ -69,10 +67,10 @@ while true; do
 		"" | $'\r')
 			printf '\e8'
 			if (( ${#matches[@]} )); then
-				output=${matches[sel]}
+				printf '%s\n' "${matches[sel]}"
 			else
-				output=$text
-			fi
+				printf '%s\n' "$text"
+			fi >&6
 			printf '\e7'
 			break
 			;;
@@ -103,4 +101,4 @@ while true; do
 			text+=$key
 			;;
 	esac
-done < /dev/tty > /dev/tty
+done
