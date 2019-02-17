@@ -11,7 +11,7 @@ while true; do
 	unset length max_items
 
 	[[ ${text_cache-x} != "$text" ]] && {
-		unset starting sel matches
+		unset sel matches
 		for i in "${!items[@]}"; do
 			[[ ${items[i]} == *"$text"* ]] && {
 				matches+=("${items[i]}")
@@ -19,9 +19,9 @@ while true; do
 					longest=${#items[i]}
 			}
 		done
+		starting=(0 0)
 	}
 
-	[[ -z ${starting[*]} ]] && starting=(0 0)
 	(( length += longest + 5 ))
 	(( max_items += starting ))
 
