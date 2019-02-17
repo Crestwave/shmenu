@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
 shopt -s checkwinsize
-IFS=$'\n' read -t 0.01 -d "" -ra items
+IFS=$'\n' read -d "" -ra items
 exec 6>&1 < /dev/tty > /dev/tty
+(:); [[ -z ${LINES}${COLUMNS} ]] &&
+	read -r LINES COLUMNS < <(stty size)
 
 trap 'printf "\e[H%*s\e8\e[?7h" "$COLUMNS" ""' EXIT
 
@@ -57,13 +59,17 @@ while true; do
 		$(( ${#text} + 2 ))
 
 	read -srn 1
+
 	if [[ $REPLY == $'\e' ]]; then
 		read -rsn 2 key
 		key=${REPLY}${key}
 	else
 		key=$REPLY
 	fi
-	read -t 0.01 -d "" -rs _
+
+	while read -t 0; do
+		read -rsn 1 _
+	done
 
 	text_cache=$text
 
