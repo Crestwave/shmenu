@@ -42,26 +42,10 @@ while true; do
 				(( length = COLUMNS ))
 				break
 			fi
-
-	#		if (( i == sel )); then
-	#			printf '\e[1;37;7m %s \e[m' "${matches[i]}"
-	#		else
-	#			printf '\e[30;41m %s \e[m' "${matches[i]}"
-	#		fi
 		done
 	}
 
-#		for (( i = starting; i < ${#matches[@]}; i++ )); do
-#			(( length == COLUMNS - ${#matches[i]} - 7 )) && (( length = COLUMNS )) && break
-#			if (( i == sel )); then
-#				printf '\e[1;37;7m %s \e[m' "${matches[i]}"
-#			else
-#				printf '\e[30;41m %s \e[m' "${matches[i]}"
-#			fi
-#		done
 	[[ -n ${matches[*]} ]] && {
-#		printf '\e[2H'
-#		echo "$sel $starting $max_items"
 		printf '\e[;%sH' $(( longest - ${#text} + 6 ))
 		matches[sel]=$'\e[m\e[D\e[1;37;7m '${matches[sel]}
 		printf '\e[30;41m %s \e[m' "${matches[@]:starting:max_items-starting}"
