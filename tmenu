@@ -8,8 +8,6 @@ trap 'printf "\e[H%*s\e8\e[?7h" "$COLUMNS" ""' EXIT
 
 printf '\e7\e[?7l'
 while true; do
-	unset length max_items
-
 	[[ ${text_cache-x} != "$text" ]] && {
 		unset sel matches
 		for i in "${!items[@]}"; do
@@ -22,32 +20,53 @@ while true; do
 		starting=(0 0)
 	}
 
-	(( length += longest + 5 ))
-	(( max_items += starting ))
-
 	(:)
 	printf '\e[?25l\e[H\e[30;41m %s%*s\e[m' \
 		"$text" \
 		$(( longest - ${#text} + 4 )) "${starting[2]:+<} "
 
-	for (( i = starting; i < ${#matches[@]}; i++ )); do
-		if (( length < COLUMNS - ${#matches[i]} - 7 )); then
-			(( length += ${#matches[i]} + 2 ))
-			(( max_items++ ))
-		else
-			printf '\e[30;41m%*s\e[;%sH%s\n\e[m' \
-				$(( COLUMNS - length )) "" \
-				$(( COLUMNS - 1 )) ">"
-			(( length = COLUMNS ))
-			break
-		fi
+	(( starting == max_items )) && {
+		unset length max_items
+		(( length += longest + 5 ))
+		(( max_items += starting ))
 
-		if (( i == sel )); then
-			printf '\e[1;37;7m %s \e[m' "${matches[i]}"
-		else
-			printf '\e[30;41m %s \e[m' "${matches[i]}"
-		fi
-	done
+		for (( i = starting; i < ${#matches[@]}; i++ )); do
+			if (( length < COLUMNS - ${#matches[i]} - 7 )); then
+				(( length += ${#matches[i]} + 2 ))
+				(( max_items++ ))
+			else
+				printf '\e[30;41m\e[;%sH%*s\e[;%sH%s\n\e[m' \
+					$(( COLUMNS - (COLUMNS - length) )) \
+					$(( COLUMNS - length )) "" \
+					$(( COLUMNS - 1 )) "> "
+				(( length = COLUMNS ))
+				break
+			fi
+
+	#		if (( i == sel )); then
+	#			printf '\e[1;37;7m %s \e[m' "${matches[i]}"
+	#		else
+	#			printf '\e[30;41m %s \e[m' "${matches[i]}"
+	#		fi
+		done
+	}
+
+#		for (( i = starting; i < ${#matches[@]}; i++ )); do
+#			(( length == COLUMNS - ${#matches[i]} - 7 )) && (( length = COLUMNS )) && break
+#			if (( i == sel )); then
+#				printf '\e[1;37;7m %s \e[m' "${matches[i]}"
+#			else
+#				printf '\e[30;41m %s \e[m' "${matches[i]}"
+#			fi
+#		done
+	[[ -n ${matches[*]} ]] && {
+#		printf '\e[2H'
+#		echo "$sel $starting $max_items"
+		printf '\e[;%sH' $(( longest - ${#text} + 6 ))
+		matches[sel]=$'\e[m\e[D\e[1;37;7m '${matches[sel]}
+		printf '\e[30;41m %s \e[m' "${matches[@]:starting:max_items-starting}"
+		matches[sel]=${matches[sel]#$'\e[m\e[D\e[1;37;7m '}
+	}
 
 	printf '\e[30;41m%*s\e[m\e[?25h\e[;%sH' \
 		$(( COLUMNS - length )) "" \
@@ -82,6 +101,7 @@ while true; do
 			(( sel > 0 && sel-- && sel == starting - 1 )) && {
 				starting[0]=${starting[${#starting[@]}-2]}
 				unset starting[${#starting[@]}-1]
+				(( max_items = starting ))
 			}
 			;;
 		$'\e[C' | $'\e[B')
