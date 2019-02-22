@@ -62,8 +62,8 @@ while true; do
 	}
 
 	[[ -n ${matches[*]} ]] && {
-		printf '\e[;%sH' $(( longest - ${#text} + 6 ))
 		matches[sel]=$'\e[m\e[D\e[1;37;7m '${matches[sel]}
+		printf '\e[;%sH' $(( longest + 6 ))
 		printf '\e[30;41m %s \e[m' \
 			"${matches[@]:index:max_items-index}"
 		matches[sel]=${matches[sel]#$'\e[m\e[D\e[1;37;7m '}
