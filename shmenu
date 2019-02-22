@@ -5,7 +5,10 @@ shopt -s checkwinsize
 exec 6>&1 < /dev/tty > /dev/tty
 
 trap 'printf "\e[H%*s\e8\e[?7h" "$COLUMNS" ""' EXIT
-trap 'REPLY=redraw; break' WINCH
+trap '[[ -z $REPLY ]] && {
+	REPLY=redraw
+	break
+}' WINCH
 
 printf '\e7\e[?7l'
 while true; do
