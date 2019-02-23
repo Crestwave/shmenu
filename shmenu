@@ -28,7 +28,8 @@ while true; do
 			(( ${#item} > longest )) && longest=${#item}
 		done
 
-		mapfile -s 1 -t matches <<< "${matches[@]}"
+		mapfile -d $'\n' -s 1 -t matches \
+			<<< "${matches[0]}${matches[1]}${matches[2]}"
 		index=(0 0)
 	}
 
