@@ -102,14 +102,14 @@ while true; do
 		$'\e')
 			exit
 			;;
-		$'\e[D' | $'\e[A')
+		$'\e'[\[O][DA])
 			(( sel > 0 && sel-- && sel == index - 1 )) && {
 				index[0]=${index[${#index[@]}-2]}
 				unset index[${#index[@]}-1]
 				(( max_items = index ))
 			}
 			;;
-		$'\e[C' | $'\e[B')
+		$'\e'[\[O][CB])
 			((
 				sel < ${#matches[@]} - 1 &&
 				++sel &&
