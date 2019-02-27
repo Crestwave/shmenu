@@ -2,7 +2,7 @@
 
 mapfile -t items
 shopt -s checkwinsize
-exec 6>&1 < /dev/tty > /dev/tty
+exec 6>&1 </dev/tty >/dev/tty
 
 trap 'printf "\e[H%*s\e8\e[?7h" "$COLUMNS" ""' EXIT
 trap '[[ -z $REPLY ]] && {
@@ -79,9 +79,6 @@ while true; do
 	if [[ $REPLY == $'\e' ]]; then
 		read -t 0.01 -rsn 2 key
 		key=${REPLY}${key}
-	elif [[ $REPLY == redraw ]]; then
-		(( max_items = index ))
-		continue
 	else
 		key=$REPLY
 	fi
@@ -125,6 +122,10 @@ while true; do
 			;;
 		$'\t')
 			text=${matches[sel]}
+			;;
+		redraw)
+			(( max_items = index ))
+			continue
 			;;
 		*)
 			text+=$key
