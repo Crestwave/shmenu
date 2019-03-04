@@ -1,6 +1,6 @@
 # shmenu
 
-Dynamic menu for the terminal written in pure bash
+A dynamic menu written in pure bash
 
 ## Usage
 
