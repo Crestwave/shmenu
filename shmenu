@@ -54,7 +54,8 @@ while true; do
 		done
 
 		(( sel && sel >= max_items )) && {
-			(( index = max_items ))
+			index+=("$max_items")
+			index=$max_items
 			continue
 		}
 	}
