@@ -101,8 +101,8 @@ while true; do
 			;;
 		$'\e'[\[O][DA])
 			(( sel > 0 && sel-- && sel == index - 1 )) && {
-				index[0]=${index[${#index[@]}-2]}
-				unset index[${#index[@]}-1]
+				index[0]=${index[-2]}
+				unset index[-1]
 				(( max_items = index ))
 			}
 			;;
@@ -113,7 +113,7 @@ while true; do
 				sel == max_items &&
 				max_items < ${#items[@]}
 			)) && {
-				index[${#index[@]}]=$max_items
+				index+=("$max_items")
 				index[0]=$max_items
 			}
 			;;
