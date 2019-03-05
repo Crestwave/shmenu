@@ -4,7 +4,7 @@ mapfile -t items
 shopt -s checkwinsize
 exec 6>&1 </dev/tty >/dev/tty
 
-trap 'printf "\e[H%*s\e8\e[?7h" "$COLUMNS" ""' EXIT
+trap 'printf "\e[H%${COLUMNS}s\e8\e[?7h"' EXIT
 trap '[[ -z $REPLY ]] && break' WINCH
 
 printf '\e7\e[?7l'
