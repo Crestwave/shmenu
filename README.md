@@ -2,7 +2,7 @@
 
 A dynamic menu for the terminal written in pure Bash
 
-[![asciicast](https://asciinema.org/a/232465.svg)](https://asciinema.org/a/232465)
+[![asciicast](https://asciinema.org/a/232466.svg)](https://asciinema.org/a/232466)
 
 ## Usage
 
