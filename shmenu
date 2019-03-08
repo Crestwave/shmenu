@@ -2,7 +2,7 @@
 
 mapfile -t items
 shopt -s checkwinsize
-exec 6>&1 </dev/tty >/dev/tty
+exec 3>&1 </dev/tty >/dev/tty
 
 trap 'printf "\e[H%${COLUMNS}s\e8\e[?7h"' EXIT
 trap '[[ -z $REPLY ]] && break' WINCH
@@ -90,7 +90,7 @@ while true; do
 				printf '%s\n' "${matches[sel]}"
 			else
 				printf '%s\n' "$text"
-			fi >&6
+			fi >&3
 			printf '\e7'
 			exit
 			;;
