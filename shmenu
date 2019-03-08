@@ -91,6 +91,7 @@ while true; do
 			else
 				printf '%s\n' "$text"
 			fi >&6
+			printf '\e7'
 			exit
 			;;
 		$'\e')
