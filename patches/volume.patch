@@ -1,0 +1,42 @@
+--- shmenu
++++ vol
+@@ -1,6 +1,8 @@
+ #!/usr/bin/env bash
++#
++# Sets the volume to the selected percentage with amixer
+ 
+-mapfile -t items
++items=({1..100})
+ shopt -s checkwinsize
+ exec 3>&1 </dev/tty >/dev/tty
+ 
+@@ -53,6 +55,12 @@
+ 			fi
+ 		done
+ 
++		[[ -v text_cache ]] || {
++			IFS=[ read -d "" -r _ sel <<< "$(amixer -M get Master)"
++			(( sel = ${sel%%%*} - 1 ))
++			text_cache=
++		}
++
+ 		(( sel && sel >= max_items )) && {
+ 			index+=("$max_items")
+ 			index[0]=$max_items
+@@ -85,13 +93,9 @@
+ 
+ 	case $key in
+ 		$'\n' | $'\r')
+-			printf '\e8'
+-			if (( ${#matches[@]} )); then
+-				printf '%s\n' "${matches[sel]}"
+-			else
+-				printf '%s\n' "$text"
+-			fi >&3
+-			printf '\e7'
++			(( ${#matches[@]} )) && {
++				amixer -M set Master $(( matches[sel] + 1 ))%
++			} &>/dev/null
+ 			exit
+ 			;;
+ 		$'\e')
