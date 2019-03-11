@@ -44,10 +44,9 @@ while true; do
 				(( length += ${#matches[i]} + 2 ))
 				(( max_items++ ))
 			else
-				printf '\e[30;41m\e[;%sH%*s\e[;%sH%s\e[m' \
+				printf '\e[30;41m\e[;%sH%*s\e[D%s\e[m' \
 					"$length" \
 					$(( COLUMNS - length )) "" \
-					$(( COLUMNS - 1 )) \
 					"> "
 				(( length = COLUMNS ))
 				break
