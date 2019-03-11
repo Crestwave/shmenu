@@ -1,0 +1,59 @@
+--- shmenu
++++ shmenu-b
+@@ -4,7 +4,7 @@
+ shopt -s checkwinsize
+ exec 3>&1 </dev/tty >/dev/tty
+ 
+-trap 'printf "\e[H%${COLUMNS}s\e8\e[?7h"' EXIT
++trap 'printf "\e[${LINES}H%${COLUMNS}s\e8\e[?7h"' EXIT
+ trap '[[ -z $REPLY ]] && break' WINCH
+ 
+ printf '\e7\e[?7l'
+@@ -30,7 +30,8 @@
+ 		index=(0 0)
+ 	}
+ 
+-	printf '\e[?25l\e[H\e[30;41m %s%*s\e[m' \
++	printf '\e[?25l\e[%sH\e[30;41m %s%*s\e[m' \
++		"$LINES" \
+ 		"$text" \
+ 		$(( longest - ${#text} + 4 )) "${index[2]:+<} "
+ 
+@@ -44,8 +45,8 @@
+ 				(( length += ${#matches[i]} + 2 ))
+ 				(( max_items++ ))
+ 			else
+-				printf '\e[30;41m\e[;%sH%*s\e[D%s\e[m' \
+-					"$length" \
++				printf '\e[30;41m\e[%sH%*s\e[D%s\e[m' \
++					"$LINES;$length" \
+ 					$(( COLUMNS - length )) "" \
+ 					"> "
+ 				(( length = COLUMNS ))
+@@ -62,15 +63,15 @@
+ 
+ 	(( ${#matches[@]} )) && {
+ 		matches[sel]=$'\e[D\e[0;7m '${matches[sel]}
+-		printf '\e[;%sH' $(( longest + 6 ))
++		printf "\e[$LINES;$(( longest + 6 ))H"
+ 		printf '\e[30;41m %s \e[m' \
+ 			"${matches[@]:index:max_items-index}"
+ 		matches[sel]=${matches[sel]#$'\e[D\e[0;7m '}
+ 	}
+ 
+-	printf '\e[30;41m%*s\e[m\e[?25h\e[;%sH' \
++	printf '\e[30;41m%*s\e[m\e[?25h\e[%sH' \
+ 		$(( COLUMNS - length )) "" \
+-		$(( ${#text} + 2 ))
++		"$LINES;$(( ${#text} + 2 ))"
+ 
+ 	until read -t 0.05 -rsN 1; do :; done
+ 
+@@ -85,6 +86,7 @@
+ 
+ 	case $key in
+ 		$'\n' | $'\r')
++			printf "\e[${LINES}H%${COLUMNS}s"
+ 			printf '\e8'
+ 			if (( ${#matches[@]} )); then
+ 				printf '%s\n' "${matches[sel]}"
