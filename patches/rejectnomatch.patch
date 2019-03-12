@@ -1,0 +1,30 @@
+--- shmenu
++++ shmenu-r
+@@ -11,7 +11,7 @@
+ while true; do
+ 	(:)
+ 	[[ ${text_cache-${text}x} != "$text" ]] && {
+-		unset sel max_items matches
++		unset matches
+ 
+ 		for item in "${items[@]}"; do
+ 			case $item in
+@@ -27,7 +27,17 @@
+ 
+ 		mapfile -s 1 -t matches \
+ 			<<< "${matches[0]}${matches[1]}${matches[2]}"
+-		index=(0 0)
++
++		(( ${#matches[@]} == 0 )) && {
++			text=$text_cache
++			text_cache=${text}keep
++			continue
++		}
++
++		[[ $text_cache != ${text}keep ]] && {
++			unset sel max_items
++			index=(0 0)
++		}
+ 	}
+ 
+ 	printf '\e[?25l\e[H\e[30;41m %s%*s\e[m' \
