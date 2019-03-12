@@ -5,7 +5,7 @@ shopt -s checkwinsize
 exec 3>&1 </dev/tty >/dev/tty
 
 trap 'printf "\e[H%${COLUMNS}s\e8\e[?7h"' EXIT
-trap '[[ -z $REPLY ]] && break' WINCH
+trap 'key=redraw' WINCH
 
 printf '\e7\e[?7l'
 while true; do
@@ -72,7 +72,9 @@ while true; do
 		$(( COLUMNS - length )) "" \
 		$(( ${#text} + 2 ))
 
-	until read -t 0.05 -rsN 1; do :; done
+	until read -t 0.05 -rsN 1; do
+		[[ $key == redraw ]] && break
+	done
 
 	if [[ $REPLY == $'\e' ]]; then
 		read -t 0.01 -rsN 2 key
@@ -123,7 +125,6 @@ while true; do
 			;;
 		"")
 			(( max_items = index ))
-			continue
 			;;
 		*)
 			text+=$key
