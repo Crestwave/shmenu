@@ -3,7 +3,7 @@
 @@ -1,6 +1,8 @@
  #!/usr/bin/env bash
 +#
-+# Sets the volume to the selected percentage with amixer
++# Sets the volume to the selected percentage using amixer.
  
 -mapfile -t items
 +items=({1..100})
@@ -14,7 +14,7 @@
  			fi
  		done
  
-+		[[ -v text_cache ]] || {
++		[[ -z ${text_cache+x} ]] && {
 +			IFS=[ read -d "" -r _ sel <<< "$(amixer -M get Master)"
 +			(( sel = ${sel%%%*} - 1 ))
 +			text_cache=
@@ -23,7 +23,7 @@
  		(( sel && sel >= max_items )) && {
  			index+=("$max_items")
  			index[0]=$max_items
-@@ -85,13 +93,9 @@
+@@ -87,13 +95,9 @@
  
  	case $key in
  		$'\n' | $'\r')
@@ -35,7 +35,7 @@
 -			fi >&3
 -			printf '\e7'
 +			(( ${#matches[@]} )) && {
-+				amixer -M set Master $(( matches[sel] + 1 ))%
++				amixer -M set Master "${matches[sel]}%"
 +			} &>/dev/null
  			exit
  			;;

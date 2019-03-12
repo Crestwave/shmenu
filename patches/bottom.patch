@@ -6,7 +6,7 @@
  
 -trap 'printf "\e[H%${COLUMNS}s\e8\e[?7h"' EXIT
 +trap 'printf "\e[${LINES}H%${COLUMNS}s\e8\e[?7h"' EXIT
- trap '[[ -z $REPLY ]] && break' WINCH
+ trap 'key=redraw' WINCH
  
  printf '\e7\e[?7l'
 @@ -30,7 +30,8 @@
@@ -47,9 +47,9 @@
 -		$(( ${#text} + 2 ))
 +		"$LINES;$(( ${#text} + 2 ))"
  
- 	until read -t 0.05 -rsN 1; do :; done
- 
-@@ -85,6 +86,7 @@
+ 	until read -t 0.05 -rsN 1; do
+ 		[[ $key == redraw ]] && break
+@@ -87,6 +88,7 @@
  
  	case $key in
  		$'\n' | $'\r')
