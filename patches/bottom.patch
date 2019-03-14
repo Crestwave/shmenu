@@ -23,11 +23,11 @@
  				(( length += ${#matches[i]} + 2 ))
  				(( max_items++ ))
  			else
--				printf '\e[30;41m\e[;%sH%*s\e[D%s\e[m' \
+-				printf '\e[30;41m\e[;%sH%*s%s\e[m' \
 -					"$length" \
-+				printf '\e[30;41m\e[%sH%*s\e[D%s\e[m' \
++				printf '\e[30;41m\e[%sH%*s%s\e[m' \
 +					"$LINES;$length" \
- 					$(( COLUMNS - length )) "" \
+ 					$(( COLUMNS - length - 1 )) "" \
  					"> "
  				(( length = COLUMNS ))
 @@ -62,15 +63,15 @@
