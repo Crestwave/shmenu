@@ -99,14 +99,14 @@ while true; do
 		$'\e')
 			exit
 			;;
-		$'\e'[\[O][DA])
+		$'\e'[[O][DA])
 			(( sel > 0 && sel-- && sel == index - 1 )) && {
 				index[0]=${index[-2]}
 				unset 'index[-1]'
 				(( max_items = index ))
 			}
 			;;
-		$'\e'[\[O][CB])
+		$'\e'[[O][CB])
 			((
 				sel < ${#matches[@]} - 1 &&
 				++sel &&
