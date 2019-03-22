@@ -2,14 +2,14 @@
 
 mapfile -t items
 shopt -s checkwinsize
-exec 3>&1 </dev/tty >/dev/tty
+exec 3>&1
+[[ -c /dev/tty ]] && exec </dev/tty >/dev/tty
 
 trap 'printf "\e[H%${COLUMNS}s\e8\e[?7h"' EXIT
 trap 'key=redraw' WINCH
 
 printf '\e7\e[?7l'
-while true; do
-	(:)
+while (:); do
 	[[ ${text_cache-${text}x} != "$text" ]] && {
 		unset sel max_items matches
 

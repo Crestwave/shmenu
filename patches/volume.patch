@@ -15,7 +15,7 @@
  		done
  
 +		[[ -z ${text_cache+x} ]] && {
-+			IFS=[ read -d "" -r _ sel <<< "$(amixer -M get Master)"
++			amixer -M get Master | IFS="[" read -d "" -r _ sel
 +			(( sel = ${sel%%%*} - 1 ))
 +			text_cache=
 +		}
