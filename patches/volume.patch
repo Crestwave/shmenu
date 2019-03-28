@@ -15,8 +15,8 @@
  		done
  
 +		[[ -z ${text_cache+x} ]] && {
-+			amixer -M get Master | IFS='[' read -d "" -r _ sel
-+			(( sel = ${sel%%%*} - 1 ))
++			[[ $(amixer -M get Master) =~ .*\[([0-9]+)%\].* ]]
++			(( sel = BASH_REMATCH[1] - 1 ))
 +			text_cache=
 +		}
 +
