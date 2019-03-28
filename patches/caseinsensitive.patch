@@ -6,6 +6,6 @@
  mapfile -t items
 -shopt -s checkwinsize
 +shopt -s checkwinsize nocasematch
- exec 3>&1 </dev/tty >/dev/tty
+ exec 3>&1
+ [[ -c /dev/tty ]] && exec </dev/tty >/dev/tty
  
- trap 'printf "\e[H%${COLUMNS}s\e8\e[?7h"' EXIT

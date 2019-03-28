@@ -1,8 +1,8 @@
 --- shmenu
 +++ shmenu-b
-@@ -4,7 +4,7 @@
- shopt -s checkwinsize
- exec 3>&1 </dev/tty >/dev/tty
+@@ -5,7 +5,7 @@
+ exec 3>&1
+ [[ -c /dev/tty ]] && exec </dev/tty >/dev/tty
  
 -trap 'printf "\e[H%${COLUMNS}s\e8\e[?7h"' EXIT
 +trap 'printf "\e[${LINES}H%${COLUMNS}s\e8\e[?7h"' EXIT

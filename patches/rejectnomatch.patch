@@ -1,8 +1,8 @@
 --- shmenu
 +++ shmenu-r
 @@ -11,7 +11,7 @@
- while true; do
- 	(:)
+ printf '\e7\e[?7l'
+ while (:); do
  	[[ ${text_cache-${text}x} != "$text" ]] && {
 -		unset sel max_items matches
 +		unset matches
