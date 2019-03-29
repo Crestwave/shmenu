@@ -21,7 +21,7 @@
  
 @@ -44,8 +45,8 @@
  				(( length += ${#matches[i]} + 2 ))
- 				(( max_items++ ))
+ 				(( ++max_items ))
  			else
 -				printf '\e[30;41m\e[;%sH%*s%s\e[m' \
 -					"$length" \
