@@ -39,10 +39,10 @@ while (:); do
 		(( length += longest + 5 ))
 		(( max_items += index ))
 
-		for (( i = index; i < ${#matches[@]}; i++ )); do
+		for (( i = index; i < ${#matches[@]}; ++i )); do
 			if (( length < COLUMNS - ${#matches[i]} - 7 )); then
 				(( length += ${#matches[i]} + 2 ))
-				(( max_items++ ))
+				(( ++max_items ))
 			else
 				printf '\e[30;41m\e[;%sH%*s%s\e[m' \
 					"$length" \
