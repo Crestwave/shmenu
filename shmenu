@@ -5,7 +5,7 @@ shopt -s checkwinsize
 exec 3>&1
 [[ -c /dev/tty ]] && exec </dev/tty >/dev/tty
 
-trap 'printf "\e[H%${COLUMNS}s\e8\e[?7h"' EXIT
+trap 'printf "\e[H\e[m%${COLUMNS}s\e8\e[?7h"' EXIT
 trap 'key=redraw' WINCH
 
 printf '\e7\e[?7l'
@@ -21,7 +21,7 @@ while (:); do
 				*)		continue ;;
 			esac
 
-			matches[_]+=$'\n'$item
+			printf -v 'matches[_]' '%s\n%q' "${matches[_]}" "$item"
 			(( ${#item} > longest )) && longest=${#item}
 		done
 
@@ -30,7 +30,7 @@ while (:); do
 		index=(0 0)
 	}
 
-	printf '\e[?25l\e[H\e[30;41m %s%*s\e[m' \
+	printf '\e[?25l\e[H\e[0;30;41m %s%*s\e[m' \
 		"$text" \
 		$(( longest - ${#text} + 4 )) "${index[2]:+<} "
 
@@ -88,11 +88,14 @@ while (:); do
 	case $key in
 		$'\n' | $'\r')
 			printf '\e8'
+
 			if (( ${#matches[@]} )); then
-				printf '%s\n' "${matches[sel]}"
+				: "${matches[sel]}"
 			else
-				printf '%s\n' "$text"
-			fi >&3
+				: "$text"
+			fi
+			eval "printf '%s\n' $_" >&3
+
 			printf '\e7'
 			exit
 			;;
