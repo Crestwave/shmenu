@@ -11,7 +11,8 @@ trap 'key=redraw' WINCH
 printf '\e7\e[?7l'
 while (:); do
 	[[ ${text_cache-${text}x} != "$text" ]] && {
-		unset sel max_items matches
+		unset matches
+		(( sel = max_items = 0 ))
 
 		for item in "${items[@]}"; do
 			case $item in
@@ -35,7 +36,7 @@ while (:); do
 		$(( longest - ${#text} + 4 )) "${index[2]:+<} "
 
 	(( index == max_items )) && {
-		unset length max_items
+		(( length = max_items = 0 ))
 		(( length += longest + 5 ))
 		(( max_items += index ))
 
