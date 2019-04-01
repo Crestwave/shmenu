@@ -10,7 +10,7 @@ Simply direct the items to `shmenu`'s stdin, separated by newlines.
 
 ## Dependencies
 
-- `bash 4+`
+- `bash 4.1+`
 
 ## Q&A
 
