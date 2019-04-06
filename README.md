@@ -26,4 +26,8 @@ The only time I used that with `dmenu` was when I was executing commands, and th
 
 ### Why does it glitch out or flicker when I move the selection?
 
-Bash does not have a way to permanently turn off echoing input without external utilities. `shmenu` works around this by using `read`'s `-s` option, which turns it off while it's receiving input, and running fast enough that `read` usually catches all input. However, if your autorepeat rate is very high and your environment isn't very fast, it can outpace it and cause input to occasionally flicker on the screen. You can fix this by applying the stty patch (`git apply patches/stty.patch`), which turns it off using the `stty` external utility.
+TL;DR: Run `git apply patches/stty.patch` within the cloned repository to fix it
+
+Bash does not have a way to permanently turn off echoing input without external utilities. `shmenu` works around this by using `read`'s `-s` option, which turns it off while it's receiving input, and running fast enough that `read` usually catches all input.
+
+However, if your autorepeat rate is very high and your environment isn't very fast, it can outpace it and cause input to occasionally flicker on the screen. You can fix this by applying the stty patch, which turns it off using the `stty` external utility.
