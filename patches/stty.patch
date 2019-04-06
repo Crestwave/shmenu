@@ -1,0 +1,13 @@
+--- shmenu
++++ shmenu-stty
+@@ -4,8 +4,9 @@
+ shopt -s checkwinsize
+ exec 3>&1
+ exec </dev/tty >/dev/tty || exit
++stty -echo
+ 
+-trap 'printf "\e[H\e[m%${COLUMNS}s\e8\e[?7h"' EXIT
++trap 'stty echo; printf "\e[H\e[m%${COLUMNS}s\e8\e[?7h"' EXIT
+ trap 'key=redraw' WINCH
+ 
+ printf '\e7\e[?7l'
