@@ -3,7 +3,7 @@
 mapfile -t items
 shopt -s checkwinsize
 exec 3>&1
-[[ -c /dev/tty ]] && exec </dev/tty >/dev/tty
+exec </dev/tty >/dev/tty || exit
 
 trap 'printf "\e[H\e[m%${COLUMNS}s\e8\e[?7h"' EXIT
 trap 'key=redraw' WINCH

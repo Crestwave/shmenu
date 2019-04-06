@@ -11,6 +11,8 @@ Simply direct the items to `shmenu`'s stdin, separated by newlines.
 ## Dependencies
 
 - `bash 4.3+`
+- A VT100-compatible terminal
+	- Pretty much every virtual \*nix terminal should support this
 
 ## Q&A
 
