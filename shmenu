@@ -16,9 +16,9 @@ while (:); do
 
 		for item in "${items[@]}"; do
 			case $item in
-				$text)		: 0 ;;
-				$text*)		: 1 ;;
-				*$text*)	: 2 ;;
+				"$text")	: 0 ;;
+				"$text"*)	: 1 ;;
+				*"$text"*)	: 2 ;;
 				*)		continue ;;
 			esac
 
