@@ -31,3 +31,7 @@ TL;DR: Run `git apply patches/stty.patch` within the cloned repository to fix it
 Bash does not have a way to permanently turn off echoing input without external utilities. `shmenu` works around this by using `read`'s `-s` option, which turns it off while it's receiving input, and running fast enough that `read` usually catches all input.
 
 However, if your autorepeat rate is very high and your environment isn't very fast, it can outpace it and cause input to occasionally flicker on the screen. You can fix this by applying the stty patch, which turns it off using the `stty` external utility.
+
+### How? Why?
+
+My internet was down for over a week and I had [Writing a TUI in Bash](https://github.com/dylanaraps/writing-a-tui-in-bash) cloned. Special thanks to it!
